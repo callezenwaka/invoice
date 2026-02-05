@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice Generator</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <header class="app-header">
         <h1 class="app-title">Invoice Generator</h1>
@@ -38,24 +40,26 @@
             <form id="invoiceForm" aria-label="Invoice form">
                 <!-- Header: Logo and Title -->
                 <div class="invoice-header">
-                    <div class="logo-upload" role="button" tabindex="0" aria-label="Upload company logo">
+                    <label class="logo-upload" for="logoInput" aria-label="Upload company logo">
                         <input type="file" id="logoInput" accept="image/*" aria-label="Choose logo file">
                         <div class="logo-placeholder" id="logoPlaceholder">
                             <span>+</span> Add Your Logo
                         </div>
-                        <img id="logoPreview" class="logo-preview" alt="Company logo" style="display: none;">
-                    </div>
+                        <img id="logoPreview" class="logo-preview" alt="Company logo">
+                    </label>
 
                     <!-- From Section -->
                     <div class="from-section">
-                        <textarea class="from-textarea" id="fromAddress" placeholder="Who is this from?" aria-label="From address" required></textarea>
+                        <textarea class="from-textarea" id="fromAddress" placeholder="Who is this from?"
+                            aria-label="From address" required></textarea>
                     </div>
 
                     <div class="invoice-title-section">
                         <div class="invoice-title">INVOICE</div>
                         <div class="invoice-number-row">
                             <span class="invoice-number-prefix">#</span>
-                            <input type="text" class="invoice-number-input" id="invoiceNumber" value="1" aria-label="Invoice number">
+                            <input type="text" class="invoice-number-input" id="invoiceNumber" value="1"
+                                aria-label="Invoice number">
                         </div>
                     </div>
                 </div>
@@ -64,12 +68,14 @@
                 <div class="address-details-row">
                     <div class="address-column">
                         <div class="address-label" id="billToLabel">Bill To</div>
-                        <textarea class="address-textarea" id="billTo" placeholder="Who is this to?" aria-labelledby="billToLabel" required></textarea>
+                        <textarea class="address-textarea" id="billTo" placeholder="Who is this to?"
+                            aria-labelledby="billToLabel" required></textarea>
                     </div>
 
                     <div class="address-column">
                         <div class="address-label" id="shipToLabel">Ship To</div>
-                        <textarea class="address-textarea" id="shipTo" placeholder="(optional)" aria-labelledby="shipToLabel"></textarea>
+                        <textarea class="address-textarea" id="shipTo" placeholder="(optional)"
+                            aria-labelledby="shipToLabel"></textarea>
                     </div>
 
                     <div class="details-column">
@@ -88,6 +94,22 @@
                         <div class="detail-row">
                             <label class="detail-label" for="poNumber">PO Number</label>
                             <input type="text" class="detail-input" id="poNumber" placeholder="">
+                        </div>
+                        <div class="detail-row">
+                            <label class="detail-label" for="currencySelect">Currency</label>
+                            <!-- <input type="text" class="detail-input" id="poNumber" placeholder=""> -->
+                            <!-- <label class="" for="currencySelect">Currency</label> -->
+                            <select class="detail-input" id="currencySelect">
+                                <option value="USD" data-symbol="US$">USD ($)</option>
+                                <option value="EUR" data-symbol="€">EUR (€)</option>
+                                <option value="GBP" data-symbol="£">GBP (£)</option>
+                                <option value="JPY" data-symbol="¥">JPY (¥)</option>
+                                <option value="CAD" data-symbol="CA$">CAD ($)</option>
+                                <option value="AUD" data-symbol="AU$">AUD ($)</option>
+                                <option value="CHF" data-symbol="CHF">CHF</option>
+                                <option value="CNY" data-symbol="¥">CNY (¥)</option>
+                                <option value="INR" data-symbol="₹">INR (₹)</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -117,11 +139,13 @@
                     <div class="notes-terms-column">
                         <div class="notes-group">
                             <label class="notes-label" for="notesInput">Notes</label>
-                            <textarea class="notes-textarea" id="notesInput" placeholder="Notes - any relevant information not already covered"></textarea>
+                            <textarea class="notes-textarea" id="notesInput"
+                                placeholder="Notes - any relevant information not already covered"></textarea>
                         </div>
                         <div class="terms-group">
                             <label class="terms-label" for="termsInput">Terms</label>
-                            <textarea class="terms-textarea" id="termsInput" placeholder="Terms and conditions - late fees, payment methods, delivery schedule"></textarea>
+                            <textarea class="terms-textarea" id="termsInput"
+                                placeholder="Terms and conditions - late fees, payment methods, delivery schedule"></textarea>
                         </div>
                     </div>
 
@@ -132,20 +156,24 @@
                         </div>
 
                         <div class="total-row optional-row" id="discountRow">
-                            <button type="button" class="remove-field" aria-label="Remove discount" onclick="removeDiscount()">&times;</button>
+                            <button type="button" class="remove-field" aria-label="Remove discount"
+                                onclick="removeDiscount()">&times;</button>
                             <span class="total-label">Discount</span>
                             <div class="amount-paid-wrapper">
                                 <span class="amount-paid-prefix">$</span>
-                                <input type="number" class="amount-paid-input" id="discountInput" value="0" min="0" step="0.01" aria-label="Discount amount">
+                                <input type="number" class="amount-paid-input" id="discountInput" value="0" min="0"
+                                    step="0.01" aria-label="Discount amount">
                             </div>
                         </div>
 
                         <div class="total-row">
                             <span class="total-label">Tax</span>
                             <div class="tax-input-wrapper">
-                                <input type="number" class="tax-input" id="taxInput" value="0" min="0" step="0.1" aria-label="Tax percentage">
+                                <input type="number" class="tax-input" id="taxInput" value="0" min="0" step="0.1"
+                                    aria-label="Tax percentage">
                                 <span class="tax-percent">%</span>
-                                <button type="button" class="tax-toggle" aria-label="Toggle tax type" title="Toggle between percentage and fixed amount">⇄</button>
+                                <button type="button" class="tax-toggle" aria-label="Toggle tax type"
+                                    title="Toggle between percentage and fixed amount">⇄</button>
                             </div>
                         </div>
 
@@ -155,11 +183,13 @@
                         </div>
 
                         <div class="total-row optional-row" id="shippingRow">
-                            <button type="button" class="remove-field" aria-label="Remove shipping" onclick="removeShipping()">&times;</button>
+                            <button type="button" class="remove-field" aria-label="Remove shipping"
+                                onclick="removeShipping()">&times;</button>
                             <span class="total-label">Shipping</span>
                             <div class="amount-paid-wrapper">
                                 <span class="amount-paid-prefix">$</span>
-                                <input type="number" class="amount-paid-input" id="shippingInput" value="0" min="0" step="0.01" aria-label="Shipping amount">
+                                <input type="number" class="amount-paid-input" id="shippingInput" value="0" min="0"
+                                    step="0.01" aria-label="Shipping amount">
                             </div>
                         </div>
 
@@ -172,7 +202,8 @@
                             <span class="total-label">Amount Paid</span>
                             <div class="amount-paid-wrapper">
                                 <span class="amount-paid-prefix">$</span>
-                                <input type="number" class="amount-paid-input" id="amountPaid" value="0" min="0" step="0.01" aria-label="Amount paid">
+                                <input type="number" class="amount-paid-input" id="amountPaid" value="0" min="0"
+                                    step="0.01" aria-label="Amount paid">
                             </div>
                         </div>
 
@@ -196,7 +227,7 @@
                 Download
             </button>
 
-            <div class="control-group">
+            <!-- <div class="control-group">
                 <label class="control-label" for="currencySelect">Currency</label>
                 <select class="control-select" id="currencySelect">
                     <option value="USD" data-symbol="US$">USD ($)</option>
@@ -209,7 +240,7 @@
                     <option value="CNY" data-symbol="¥">CNY (¥)</option>
                     <option value="INR" data-symbol="₹">INR (₹)</option>
                 </select>
-            </div>
+            </div> -->
 
             <button type="button" class="btn-save-template" id="saveTemplateBtn">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -219,19 +250,13 @@
                 </svg>
                 Save Template
             </button>
-
-            <button type="button" class="btn-save-default" id="saveDefaultBtn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                Save as Default
-            </button>
         </aside>
     </div>
 
     <!-- Toast Notification -->
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
+
 </html>

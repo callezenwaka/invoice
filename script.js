@@ -29,21 +29,63 @@ const InvoiceApp = {
     currentCurrency: { code: 'USD', symbol: 'US$' }
 };
 
-// Currency data
-const currencies = {
-    'USD': { code: 'USD', symbol: 'US$', name: 'USD ($)' },
-    'EUR': { code: 'EUR', symbol: '€', name: 'EUR (€)' },
-    'GBP': { code: 'GBP', symbol: '£', name: 'GBP (£)' },
-    'JPY': { code: 'JPY', symbol: '¥', name: 'JPY (¥)' },
-    'CAD': { code: 'CAD', symbol: 'CA$', name: 'CAD ($)' },
-    'AUD': { code: 'AUD', symbol: 'AU$', name: 'AUD ($)' },
-    'CHF': { code: 'CHF', symbol: 'CHF', name: 'CHF' },
-    'CNY': { code: 'CNY', symbol: '¥', name: 'CNY (¥)' },
-    'INR': { code: 'INR', symbol: '₹', name: 'INR (₹)' }
-};
+// Currency data - will be loaded from data.json
+let currencies = {};
+
+// Load currencies from data.json
+async function loadCurrencies() {
+    try {
+        const response = await fetch('data.json');
+        const data = await response.json();
+
+        // Convert array to object for easy lookup
+        data.currencies.forEach(currency => {
+            currencies[currency.code] = currency;
+        });
+
+        // Populate the currency select element
+        populateCurrencySelect();
+
+        // Set default currency if not already set
+        if (!InvoiceApp.currentCurrency.code) {
+            InvoiceApp.currentCurrency = currencies['USD'];
+        }
+    } catch (error) {
+        console.error('Error loading currencies:', error);
+        // Fallback to default currencies if loading fails
+        currencies = {
+            'USD': { code: 'USD', symbol: '$', name: 'USD ($)' },
+            'EUR': { code: 'EUR', symbol: '€', name: 'EUR (€)' },
+            'GBP': { code: 'GBP', symbol: '£', name: 'GBP (£)' }
+        };
+        populateCurrencySelect();
+    }
+}
+
+// Populate currency select dropdown
+function populateCurrencySelect() {
+    const select = document.getElementById('currencySelect');
+    if (!select) return;
+
+    // Clear existing options
+    select.innerHTML = '';
+
+    // Add all currencies
+    Object.values(currencies).forEach(currency => {
+        const option = document.createElement('option');
+        option.value = currency.code;
+        option.textContent = currency.name;
+        option.setAttribute('data-symbol', currency.symbol || currency.code);
+        select.appendChild(option);
+    });
+
+    // Set the selected value to current currency
+    select.value = InvoiceApp.invoice.currency;
+}
 
 // Initialize the application
-function init() {
+async function init() {
+    await loadCurrencies();
     loadFromLocalStorage();
     setupEventListeners();
     addDefaultLineItem();
@@ -338,20 +380,8 @@ function setupEventListeners() {
     // Save template button
     document.getElementById('saveTemplateBtn').addEventListener('click', saveTemplate);
 
-    // Save default button
-    document.getElementById('saveDefaultBtn').addEventListener('click', saveDefaults);
-
     // Logo upload
     document.getElementById('logoInput').addEventListener('change', handleLogoUpload);
-    document.querySelector('.logo-upload').addEventListener('click', () => {
-        document.getElementById('logoInput').click();
-    });
-    document.querySelector('.logo-upload').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            document.getElementById('logoInput').click();
-        }
-    });
 
     // History toggle
     document.getElementById('historyToggle').addEventListener('click', toggleHistory);
@@ -440,6 +470,11 @@ function handleCurrencyChange(event) {
     document.querySelectorAll('.amount-paid-prefix').forEach(el => {
         el.textContent = symbol.replace('US', '').replace('CA', '').replace('AU', '');
     });
+
+    // Auto-save currency preference
+    const defaults = JSON.parse(localStorage.getItem('invoiceDefaults') || '{}');
+    defaults.currency = currencyCode;
+    localStorage.setItem('invoiceDefaults', JSON.stringify(defaults));
 }
 
 // Handle theme change
@@ -461,6 +496,11 @@ function handleThemeChange(event) {
     if (themeSelect) {
         themeSelect.value = theme;
     }
+
+    // Auto-save theme preference
+    const defaults = JSON.parse(localStorage.getItem('invoiceDefaults') || '{}');
+    defaults.theme = theme;
+    localStorage.setItem('invoiceDefaults', JSON.stringify(defaults));
 }
 
 // Toggle theme from header button (light/dark only)
@@ -479,6 +519,11 @@ function toggleThemeInHeader() {
     }
 
     updateThemeIcon(newTheme);
+
+    // Auto-save theme preference
+    const defaults = JSON.parse(localStorage.getItem('invoiceDefaults') || '{}');
+    defaults.theme = newTheme;
+    localStorage.setItem('invoiceDefaults', JSON.stringify(defaults));
 }
 
 // Update theme icon
@@ -505,8 +550,8 @@ function handleLogoUpload(event) {
         const logoPlaceholder = document.getElementById('logoPlaceholder');
 
         logoPreview.src = e.target.result;
-        logoPreview.style.display = 'block';
-        logoPlaceholder.style.display = 'none';
+        logoPreview.classList.add('visible');
+        logoPlaceholder.classList.add('hidden');
 
         InvoiceApp.invoice.logo = e.target.result;
     };
