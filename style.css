@@ -2162,8 +2162,28 @@ textarea::placeholder {
     width: 280px !important;
   }
 
+  .detail-row {
+    display: flex !important;
+    align-items: center !important;
+    margin-bottom: 6px !important;
+  }
+
   .detail-label {
+    width: 110px !important;
     text-align: right !important;
+    padding-right: 8px !important;
+    font-size: 11px !important;
+    color: #333 !important;
+  }
+
+  .detail-input {
+    flex: 1 !important;
+    padding: 6px 12px !important;
+    border: 1px solid transparent !important;
+    border-radius: 4px !important;
+    font-size: 11px !important;
+    background: white !important;
+    color: black !important;
   }
 
   .items-section {
@@ -2213,7 +2233,7 @@ textarea::placeholder {
     width: 100% !important;
     min-height: 70px !important;
     padding: 10px 14px !important;
-    border: 1px solid #ddd !important;
+    border: 1px solid transparent !important;
     border-radius: 4px !important;
     font-size: 11px !important;
     font-family: inherit !important;
@@ -2241,7 +2261,7 @@ textarea::placeholder {
   input,
   textarea,
   select {
-    border: 1px solid #ddd !important;
+    border: 1px solid transparent !important;
     background: white !important;
     color: black !important;
     -webkit-appearance: none !important;
@@ -2256,6 +2276,8 @@ textarea::placeholder {
     min-height: 50px !important;
     white-space: pre-wrap !important;
     word-wrap: break-word !important;
+    border: 1px solid transparent !important;
+    resize: none !important;
   }
 
   /* Fix rate input alignment */
@@ -2266,21 +2288,27 @@ textarea::placeholder {
   }
 
   .rate-prefix {
-    padding: 6px 8px !important;
-    background: white !important;
-    border: 1px solid #ddd !important;
-    border-radius: 4px 0 0 4px !important;
-    font-size: 11px !important;
-    color: #333 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    display: none !important;
   }
 
   .rate-input-wrapper .item-input {
-    border-radius: 0 4px 4px 0 !important;
-    margin-left: -1px !important;
+    border-radius: 4px !important;
+    margin-left: 0 !important;
     padding: 6px 8px !important;
+    font-size: 11px !important;
+    text-align: center !important;
+    font-family: inherit !important;
+    font-weight: normal !important;
+    color: #000 !important;
+  }
+
+  /* Ensure all line item inputs have consistent styling */
+  .col-quantity .item-input,
+  .col-rate .item-input,
+  .item-input {
+    font-family: inherit !important;
+    font-weight: normal !important;
+    color: #000 !important;
     font-size: 11px !important;
   }
 
@@ -2292,13 +2320,25 @@ textarea::placeholder {
   .amount-paid-prefix {
     padding: 6px 8px !important;
     background: white !important;
-    border: 1px solid #ddd !important;
+    border: 1px solid transparent !important;
     border-radius: 4px 0 0 4px !important;
     font-size: 11px !important;
     color: #333 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+  }
+
+  .invoice-number-prefix {
+    background: white !important;
+    border: 1px solid transparent !important;
+    color: #333 !important;
+  }
+
+  .invoice-number-input {
+    border: 1px solid transparent !important;
+    background: white !important;
+    color: black !important;
   }
 
   .invoice-title {
@@ -2380,7 +2420,7 @@ textarea::placeholder {
   .tax-input {
     width: 50px !important;
     padding: 4px 6px !important;
-    border: 1px solid #ddd !important;
+    border: 1px solid transparent !important;
     border-radius: 4px !important;
     font-size: 11px !important;
     text-align: right !important;
@@ -2399,7 +2439,7 @@ textarea::placeholder {
   #shippingInput {
     width: 80px !important;
     padding: 6px 8px !important;
-    border: 1px solid #ddd !important;
+    border: 1px solid transparent !important;
     border-radius: 0 4px 4px 0 !important;
     margin-left: -1px !important;
     font-size: 11px !important;
@@ -2421,7 +2461,7 @@ textarea::placeholder {
 
   /* Logo sizing */
   .logo-upload {
-    border: 1px solid #ddd !important;
+    border: 1px solid transparent !important;
   }
 
   .logo-preview {
