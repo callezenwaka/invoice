@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Generator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #1a1a1a;
+            background-color: #f0f0f0;
+        }
+
+        /* Accessibility: Skip Link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: #2c7a7b;
+            color: white;
+            padding: 8px 16px;
+            z-index: 100;
+            text-decoration: none;
+        }
+        .skip-link:focus {
+            top: 0;
+        }
+
+        /* Focus styles for accessibility */
+        *:focus {
+            outline: 2px solid #2c7a7b;
+            outline-offset: 2px;
+        }
+
+        input:focus, select:focus, textarea:focus, button:focus {
+            outline: 2px solid #2c7a7b;
+            outline-offset: 1px;
+        }
+
+        .container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        /* Main Invoice Area */
+        .invoice-main {
+            flex: 1;
+            padding: 24px 32px;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+        }
+
+        /* Right Sidebar Controls */
+        .invoice-controls {
+            width: 200px;
+            padding: 24px 20px;
+            background: #f5f5f5;
+        }
+
+        /* Download Button */
+        .btn-download {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 12px 24px;
+            background-color: #48bb78;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-download:hover {
+            background-color: #38a169;
+        }
+
+        .btn-download svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Control Labels */
+        .control-group {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .control-group:first-of-type {
+            border-top: none;
+            padding-top: 0;
+            margin-top: 20px;
+        }
+
+        .control-label {
+            display: block;
+            font-size: 13px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .control-select {
+            width: 100%;
+            padding: 8px 12px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .save-default-link {
+            display: block;
+            margin-top: 16px;
+            color: #2c7a7b;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .save-default-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Invoice Header */
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+        }
+
+        /* Logo Upload */
+        .logo-upload {
+            width: 180px;
+            height: 100px;
+            border: 2px dashed #ccc;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            transition: border-color 0.2s;
+        }
+
+        .logo-upload:hover, .logo-upload:focus-within {
+            border-color: #2c7a7b;
+        }
+
+        .logo-upload input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .logo-placeholder {
+            color: #999;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .logo-placeholder span {
+            color: #999;
+            margin-right: 4px;
+        }
+
+        .logo-preview {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        /* Invoice Title Section */
+        .invoice-title-section {
+            text-align: right;
+        }
+
+        .invoice-title {
+            font-size: 36px;
+            font-weight: 400;
+            color: #1a1a1a;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .invoice-number-row {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0;
+        }
+
+        .invoice-number-prefix {
+            padding: 6px 12px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-right: none;
+            border-radius: 4px 0 0 4px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .invoice-number-input {
+            width: 80px;
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            border-radius: 0 4px 4px 0;
+            font-size: 14px;
+            text-align: right;
+        }
+
+        /* From Section */
+        .from-section {
+            margin-bottom: 16px;
+        }
+
+        .from-textarea {
+            width: 60%;
+            min-height: 80px;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .from-textarea::placeholder {
+            color: #999;
+        }
+
+        /* Bill To / Ship To / Details Row */
+        .address-details-row {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .address-column {
+            flex: 1;
+        }
+
+        .address-label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        .address-textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .address-textarea::placeholder {
+            color: #999;
+        }
+
+        /* Invoice Details (Date, Payment Terms, etc.) */
+        .details-column {
+            width: 280px;
+        }
+
+        .detail-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .detail-label {
+            width: 110px;
+            text-align: right;
+            padding-right: 12px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .detail-input {
+            flex: 1;
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        /* Items Table */
+        .items-section {
+            margin-top: 24px;
+        }
+
+        .items-header {
+            display: flex;
+            background-color: #2d3748;
+            color: white;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .items-header > div {
+            padding: 12px 16px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .col-item {
+            flex: 1;
+        }
+
+        .col-quantity {
+            width: 100px;
+            text-align: center;
+        }
+
+        .col-rate {
+            width: 120px;
+            text-align: center;
+        }
+
+        .col-amount {
+            width: 120px;
+            text-align: right;
+        }
+
+        /* Line Item Row */
+        .line-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .line-item-description {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: none;
+            min-height: 38px;
+        }
+
+        .line-item-description::placeholder {
+            color: #999;
+        }
+
+        .line-item-quantity {
+            width: 100px;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            text-align: center;
+            margin-left: 8px;
+        }
+
+        .line-item-rate-wrapper {
+            display: flex;
+            align-items: center;
+            margin-left: 8px;
+            width: 120px;
+        }
+
+        .rate-prefix {
+            padding: 8px 8px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-right: none;
+            border-radius: 4px 0 0 4px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .line-item-rate {
+            flex: 1;
+            padding: 8px 8px;
+            border: 1px solid #ddd;
+            border-radius: 0 4px 4px 0;
+            font-size: 14px;
+            text-align: right;
+        }
+
+        .line-item-amount {
+            width: 120px;
+            padding: 8px 12px;
+            text-align: right;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .line-item-delete {
+            padding: 8px;
+            background: none;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 16px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .line-item:hover .line-item-delete {
+            opacity: 1;
+        }
+
+        .line-item-delete:hover {
+            color: #e53e3e;
+        }
+
+        /* Add Line Item Button */
+        .add-line-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 12px;
+            padding: 8px 16px;
+            background: white;
+            border: 2px solid #2c7a7b;
+            border-radius: 4px;
+            color: #2c7a7b;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .add-line-btn:hover {
+            background: #2c7a7b;
+            color: white;
+        }
+
+        /* Bottom Section: Notes/Terms and Totals */
+        .bottom-section {
+            display: flex;
+            gap: 40px;
+            margin-top: 32px;
+        }
+
+        .notes-terms-column {
+            flex: 1;
+        }
+
+        .notes-group, .terms-group {
+            margin-bottom: 20px;
+        }
+
+        .notes-label, .terms-label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        .notes-textarea, .terms-textarea {
+            width: 100%;
+            min-height: 70px;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .notes-textarea::placeholder, .terms-textarea::placeholder {
+            color: #999;
+        }
+
+        /* Totals Column */
+        .totals-column {
+            width: 300px;
+        }
+
+        .total-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+
+        .total-label {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .total-value {
+            font-size: 14px;
+            color: #333;
+            text-align: right;
+        }
+
+        /* Tax Row with Input */
+        .tax-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tax-input {
+            width: 50px;
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            text-align: right;
+        }
+
+        .tax-percent {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .tax-toggle {
+            padding: 6px 8px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .tax-toggle:hover {
+            background: #f5f5f5;
+        }
+
+        /* Add Discount/Shipping Links */
+        .add-links {
+            display: flex;
+            gap: 16px;
+            padding: 8px 0;
+        }
+
+        .add-link {
+            color: #2c7a7b;
+            font-size: 14px;
+            text-decoration: none;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .add-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Amount Paid Input */
+        .amount-paid-wrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        .amount-paid-prefix {
+            padding: 6px 8px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-right: none;
+            border-radius: 4px 0 0 4px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .amount-paid-input {
+            width: 80px;
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            border-radius: 0 4px 4px 0;
+            font-size: 14px;
+            text-align: right;
+        }
+
+        /* Balance Due */
+        .balance-due-row {
+            border-top: 1px solid #ddd;
+            margin-top: 4px;
+            padding-top: 8px;
+        }
+
+        .balance-due-label {
+            font-weight: 500;
+        }
+
+        .balance-due-value {
+            font-weight: 500;
+        }
+
+        /* History Panel */
+        .history-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 16px;
+            background: #2c7a7b;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 50;
+        }
+
+        .history-toggle:hover {
+            background: #236e6e;
+        }
+
+        .history-panel {
+            position: fixed;
+            top: 0;
+            left: -360px;
+            width: 360px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: left 0.3s ease;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .history-panel.open {
+            left: 0;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .history-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .history-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 4px;
+        }
+
+        .history-close:hover {
+            color: #333;
+        }
+
+        .history-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .history-item {
+            padding: 12px;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .history-item:hover, .history-item:focus {
+            border-color: #2c7a7b;
+            outline: none;
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .history-item-number {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .history-item-date {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .history-item-client {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .history-item-total {
+            font-weight: 600;
+            color: #2c7a7b;
+        }
+
+        .history-item-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .history-btn {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .history-btn-load {
+            background: #2c7a7b;
+            color: white;
+        }
+
+        .history-btn-load:hover {
+            background: #236e6e;
+        }
+
+        .history-btn-delete {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .history-btn-delete:hover {
+            background: #fecaca;
+        }
+
+        .history-empty {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
+        }
+
+        .history-new-btn {
+            display: block;
+            width: calc(100% - 32px);
+            margin: 16px;
+            padding: 12px;
+            background: #48bb78;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .history-new-btn:hover {
+            background: #38a169;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 90;
+        }
+
+        .overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Status Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            background: #333;
+            color: white;
+            border-radius: 6px;
+            font-size: 14px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 200;
+        }
+
+        .toast.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .toast.success {
+            background: #38a169;
+        }
+
+        .toast.error {
+            background: #e53e3e;
+        }
+
+        /* Discount/Shipping Rows (hidden by default) */
+        .optional-row {
+            display: none;
+        }
+
+        .optional-row.visible {
+            display: flex;
+        }
+
+        .remove-field {
+            background: none;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            padding: 0 8px;
+            font-size: 16px;
+        }
+
+        .remove-field:hover {
+            color: #e53e3e;
+        }
+
+        /* Print styles */
+        @media print {
+            .history-toggle, .history-panel, .invoice-controls, .line-item-delete, .add-line-btn, .add-links, .overlay, .toast {
+                display: none !important;
+            }
+            
+            .container {
+                background: white;
+            }
+            
+            .invoice-main {
+                border: none;
+            }
+        }
+
+        /* Visually hidden for screen readers */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- History Toggle Button -->
+    <button class="history-toggle" id="historyToggle" aria-expanded="false" aria-controls="historyPanel">
+        📋 History
+    </button>
+
+    <!-- History Panel -->
+    <div class="overlay" id="overlay"></div>
+    <aside class="history-panel" id="historyPanel" role="dialog" aria-label="Invoice History" aria-modal="true">
+        <div class="history-header">
+            <h2 class="history-title">Invoice History</h2>
+            <button class="history-close" id="historyClose" aria-label="Close history panel">&times;</button>
+        </div>
+        <div class="history-list" id="historyList" role="list">
+            <!-- History items rendered here -->
+        </div>
+        <button class="history-new-btn" id="newInvoiceBtn">+ New Invoice</button>
+    </aside>
+
+    <div class="container">
+        <!-- Main Invoice Area -->
+        <main class="invoice-main" id="main-content">
+            <form id="invoiceForm" aria-label="Invoice form">
+                <!-- Header: Logo and Title -->
+                <div class="invoice-header">
+                    <div class="logo-upload" role="button" tabindex="0" aria-label="Upload company logo">
+                        <input type="file" id="logoInput" accept="image/*" aria-label="Choose logo file">
+                        <div class="logo-placeholder" id="logoPlaceholder">
+                            <span>+</span> Add Your Logo
+                        </div>
+                        <img id="logoPreview" class="logo-preview" alt="Company logo" style="display: none;">
+                    </div>
+
+                    <div class="invoice-title-section">
+                        <div class="invoice-title">INVOICE</div>
+                        <div class="invoice-number-row">
+                            <span class="invoice-number-prefix">#</span>
+                            <input type="text" class="invoice-number-input" id="invoiceNumber" value="1" aria-label="Invoice number">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- From Section -->
+                <div class="from-section">
+                    <textarea class="from-textarea" id="fromAddress" placeholder="Who is this from?" aria-label="From address" required></textarea>
+                </div>
+
+                <!-- Bill To, Ship To, and Details -->
+                <div class="address-details-row">
+                    <div class="address-column">
+                        <div class="address-label" id="billToLabel">Bill To</div>
+                        <textarea class="address-textarea" id="billTo" placeholder="Who is this to?" aria-labelledby="billToLabel" required></textarea>
+                    </div>
+
+                    <div class="address-column">
+                        <div class="address-label" id="shipToLabel">Ship To</div>
+                        <textarea class="address-textarea" id="shipTo" placeholder="(optional)" aria-labelledby="shipToLabel"></textarea>
+                    </div>
+
+                    <div class="details-column">
+                        <div class="detail-row">
+                            <label class="detail-label" for="invoiceDate">Date</label>
+                            <input type="text" class="detail-input" id="invoiceDate" placeholder="">
+                        </div>
+                        <div class="detail-row">
+                            <label class="detail-label" for="paymentTerms">Payment Terms</label>
+                            <input type="text" class="detail-input" id="paymentTerms" placeholder="">
+                        </div>
+                        <div class="detail-row">
+                            <label class="detail-label" for="dueDate">Due Date</label>
+                            <input type="text" class="detail-input" id="dueDate" placeholder="">
+                        </div>
+                        <div class="detail-row">
+                            <label class="detail-label" for="poNumber">PO Number</label>
+                            <input type="text" class="detail-input" id="poNumber" placeholder="">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Line Items -->
+                <section class="items-section" aria-label="Invoice line items">
+                    <div class="items-header" role="row">
+                        <div class="col-item" role="columnheader">Item</div>
+                        <div class="col-quantity" role="columnheader">Quantity</div>
+                        <div class="col-rate" role="columnheader">Rate</div>
+                        <div class="col-amount" role="columnheader">Amount</div>
+                    </div>
+
+                    <div id="lineItemsContainer" role="list" aria-label="Line items list">
+                        <!-- Line items rendered here -->
+                    </div>
+
+                    <button type="button" class="add-line-btn" id="addLineBtn">
+                        <span>+</span> Line Item
+                    </button>
+                </section>
+
+                <!-- Bottom: Notes/Terms and Totals -->
+                <div class="bottom-section">
+                    <div class="notes-terms-column">
+                        <div class="notes-group">
+                            <label class="notes-label" for="notesInput">Notes</label>
+                            <textarea class="notes-textarea" id="notesInput" placeholder="Notes - any relevant information not already covered"></textarea>
+                        </div>
+                        <div class="terms-group">
+                            <label class="terms-label" for="termsInput">Terms</label>
+                            <textarea class="terms-textarea" id="termsInput" placeholder="Terms and conditions - late fees, payment methods, delivery schedule"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="totals-column" role="region" aria-label="Invoice totals">
+                        <div class="total-row">
+                            <span class="total-label">Subtotal</span>
+                            <span class="total-value" id="subtotalDisplay">US$0.00</span>
+                        </div>
+
+                        <div class="total-row optional-row" id="discountRow">
+                            <button type="button" class="remove-field" aria-label="Remove discount" onclick="removeDiscount()">&times;</button>
+                            <span class="total-label">Discount</span>
+                            <div class="amount-paid-wrapper">
+                                <span class="amount-paid-prefix">$</span>
+                                <input type="number" class="amount-paid-input" id="discountInput" value="0" min="0" step="0.01" aria-label="Discount amount">
+                            </div>
+                        </div>
+
+                        <div class="total-row">
+                            <span class="total-label">Tax</span>
+                            <div class="tax-input-wrapper">
+                                <input type="number" class="tax-input" id="taxInput" value="0" min="0" step="0.1" aria-label="Tax percentage">
+                                <span class="tax-percent">%</span>
+                                <button type="button" class="tax-toggle" aria-label="Toggle tax type" title="Toggle between percentage and fixed amount">⇄</button>
+                            </div>
+                        </div>
+
+                        <div class="add-links">
+                            <button type="button" class="add-link" id="addDiscountBtn">+ Discount</button>
+                            <button type="button" class="add-link" id="addShippingBtn">+ Shipping</button>
+                        </div>
+
+                        <div class="total-row optional-row" id="shippingRow">
+                            <button type="button" class="remove-field" aria-label="Remove shipping" onclick="removeShipping()">&times;</button>
+                            <span class="total-label">Shipping</span>
+                            <div class="amount-paid-wrapper">
+                                <span class="amount-paid-prefix">$</span>
+                                <input type="number" class="amount-paid-input" id="shippingInput" value="0" min="0" step="0.01" aria-label="Shipping amount">
+                            </div>
+                        </div>
+
+                        <div class="total-row">
+                            <span class="total-label">Total</span>
+                            <span class="total-value" id="totalDisplay">US$0.00</span>
+                        </div>
+
+                        <div class="total-row">
+                            <span class="total-label">Amount Paid</span>
+                            <div class="amount-paid-wrapper">
+                                <span class="amount-paid-prefix">$</span>
+                                <input type="number" class="amount-paid-input" id="amountPaid" value="0" min="0" step="0.01" aria-label="Amount paid">
+                            </div>
+                        </div>
+
+                        <div class="total-row balance-due-row">
+                            <span class="total-label balance-due-label">Balance Due</span>
+                            <span class="total-value balance-due-value" id="balanceDueDisplay">US$0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </main>
+
+        <!-- Right Sidebar Controls -->
+        <aside class="invoice-controls" aria-label="Invoice settings">
+            <button type="button" class="btn-download" id="downloadBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Download
+            </button>
+
+            <div class="control-group">
+                <label class="control-label" for="themeSelect">Theme</label>
+                <select class="control-select" id="themeSelect">
+                    <option value="classic">Classic</option>
+                    <option value="slate">Slate</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="currencySelect">Currency</label>
+                <select class="control-select" id="currencySelect">
+                    <option value="USD" data-symbol="US$">USD ($)</option>
+                    <option value="EUR" data-symbol="€">EUR (€)</option>
+                    <option value="GBP" data-symbol="£">GBP (£)</option>
+                    <option value="JPY" data-symbol="¥">JPY (¥)</option>
+                    <option value="CAD" data-symbol="CA$">CAD ($)</option>
+                    <option value="AUD" data-symbol="AU$">AUD ($)</option>
+                    <option value="CHF" data-symbol="CHF">CHF</option>
+                    <option value="CNY" data-symbol="¥">CNY (¥)</option>
+                    <option value="INR" data-symbol="₹">INR (₹)</option>
+                </select>
+            </div>
+
+            <a href="#" class="save-default-link" id="saveDefaultLink">Save Default</a>
+        </aside>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script>
+        // ==================== IndexedDB Setup ====================
+        const DB_NAME = 'InvoiceDB';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'invoices';
+        let db = null;
+        let currentInvoiceId = null;
+
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    db = request.result;
+                    resolve(db);
+                };
+
+                request.onupgradeneeded = (e) => {
+                    const database = e.target.result;
+                    if (!database.objectStoreNames.contains(STORE_NAME)) {
+                        const store = database.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+                        store.createIndex('invoiceNumber', 'invoiceNumber', { unique: false });
+                        store.createIndex('createdAt', 'createdAt', { unique: false });
+                    }
+                };
+            });
+        }
+
+        function saveInvoice(invoice) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction([STORE_NAME], 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+
+                if (currentInvoiceId) {
+                    invoice.id = currentInvoiceId;
+                    invoice.updatedAt = new Date().toISOString();
+                } else {
+                    invoice.createdAt = new Date().toISOString();
+                }
+
+                const request = store.put(invoice);
+                request.onsuccess = () => {
+                    currentInvoiceId = request.result;
+                    resolve(request.result);
+                };
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        function getAllInvoices() {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction([STORE_NAME], 'readonly');
+                const store = tx.objectStore(STORE_NAME);
+                const request = store.getAll();
+
+                request.onsuccess = () => {
+                    const invoices = request.result.sort((a, b) => 
+                        new Date(b.createdAt) - new Date(a.createdAt)
+                    );
+                    resolve(invoices);
+                };
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        function getInvoice(id) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction([STORE_NAME], 'readonly');
+                const store = tx.objectStore(STORE_NAME);
+                const request = store.get(id);
+
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        function deleteInvoice(id) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction([STORE_NAME], 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                const request = store.delete(id);
+
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // ==================== State ====================
+        let lineItems = [{ description: '', quantity: 1, rate: 0 }];
+        let currencySymbol = 'US$';
+
+        // ==================== UI Functions ====================
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast visible ${type}`;
+            setTimeout(() => toast.classList.remove('visible'), 3000);
+        }
+
+        function formatCurrency(amount) {
+            return `${currencySymbol}${parseFloat(amount || 0).toFixed(2)}`;
+        }
+
+        function updateCurrency() {
+            const select = document.getElementById('currencySelect');
+            const option = select.options[select.selectedIndex];
+            currencySymbol = option.dataset.symbol || 'US$';
+            calculateTotals();
+        }
+
+        // ==================== Line Items ====================
+        function renderLineItems() {
+            const container = document.getElementById('lineItemsContainer');
+            container.innerHTML = '';
+
+            lineItems.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'line-item';
+                div.setAttribute('role', 'listitem');
+                div.innerHTML = `
+                    <textarea 
+                        class="line-item-description" 
+                        placeholder="Description of item/service..."
+                        aria-label="Item ${index + 1} description"
+                        data-index="${index}"
+                        rows="1"
+                    >${item.description}</textarea>
+                    <input 
+                        type="number" 
+                        class="line-item-quantity" 
+                        value="${item.quantity}" 
+                        min="0" 
+                        step="1"
+                        aria-label="Item ${index + 1} quantity"
+                        data-index="${index}"
+                    >
+                    <div class="line-item-rate-wrapper">
+                        <span class="rate-prefix">$</span>
+                        <input 
+                            type="number" 
+                            class="line-item-rate" 
+                            value="${item.rate}" 
+                            min="0" 
+                            step="0.01"
+                            aria-label="Item ${index + 1} rate"
+                            data-index="${index}"
+                        >
+                    </div>
+                    <div class="line-item-amount" aria-label="Item ${index + 1} amount">
+                        ${formatCurrency(item.quantity * item.rate)}
+                    </div>
+                    <button 
+                        type="button" 
+                        class="line-item-delete" 
+                        aria-label="Delete item ${index + 1}"
+                        data-index="${index}"
+                        ${lineItems.length === 1 ? 'style="visibility:hidden"' : ''}
+                    >×</button>
+                `;
+                container.appendChild(div);
+            });
+
+            // Add event listeners
+            container.querySelectorAll('.line-item-description').forEach(el => {
+                el.addEventListener('input', (e) => {
+                    const idx = parseInt(e.target.dataset.index);
+                    lineItems[idx].description = e.target.value;
+                });
+            });
+
+            container.querySelectorAll('.line-item-quantity').forEach(el => {
+                el.addEventListener('input', (e) => {
+                    const idx = parseInt(e.target.dataset.index);
+                    lineItems[idx].quantity = parseFloat(e.target.value) || 0;
+                    updateLineItemAmount(idx);
+                    calculateTotals();
+                });
+            });
+
+            container.querySelectorAll('.line-item-rate').forEach(el => {
+                el.addEventListener('input', (e) => {
+                    const idx = parseInt(e.target.dataset.index);
+                    lineItems[idx].rate = parseFloat(e.target.value) || 0;
+                    updateLineItemAmount(idx);
+                    calculateTotals();
+                });
+            });
+
+            container.querySelectorAll('.line-item-delete').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    const idx = parseInt(e.target.dataset.index);
+                    if (lineItems.length > 1) {
+                        lineItems.splice(idx, 1);
+                        renderLineItems();
+                        calculateTotals();
+                    }
+                });
+            });
+        }
+
+        function updateLineItemAmount(index) {
+            const items = document.querySelectorAll('.line-item');
+            if (items[index]) {
+                const amount = lineItems[index].quantity * lineItems[index].rate;
+                items[index].querySelector('.line-item-amount').textContent = formatCurrency(amount);
+            }
+        }
+
+        function addLineItem() {
+            lineItems.push({ description: '', quantity: 1, rate: 0 });
+            renderLineItems();
+            // Focus on the new item
+            const lastItem = document.querySelector('.line-item:last-child .line-item-description');
+            if (lastItem) lastItem.focus();
+        }
+
+        // ==================== Calculations ====================
+        function calculateTotals() {
+            const subtotal = lineItems.reduce((sum, item) => sum + (item.quantity * item.rate), 0);
+            const taxRate = parseFloat(document.getElementById('taxInput').value) || 0;
+            const tax = subtotal * (taxRate / 100);
+            const discount = parseFloat(document.getElementById('discountInput').value) || 0;
+            const shipping = parseFloat(document.getElementById('shippingInput').value) || 0;
+            const total = subtotal + tax - discount + shipping;
+            const amountPaid = parseFloat(document.getElementById('amountPaid').value) || 0;
+            const balanceDue = total - amountPaid;
+
+            document.getElementById('subtotalDisplay').textContent = formatCurrency(subtotal);
+            document.getElementById('totalDisplay').textContent = formatCurrency(total);
+            document.getElementById('balanceDueDisplay').textContent = formatCurrency(balanceDue);
+        }
+
+        // ==================== Discount/Shipping ====================
+        function addDiscount() {
+            document.getElementById('discountRow').classList.add('visible');
+            document.getElementById('discountInput').focus();
+        }
+
+        function removeDiscount() {
+            document.getElementById('discountRow').classList.remove('visible');
+            document.getElementById('discountInput').value = 0;
+            calculateTotals();
+        }
+
+        function addShipping() {
+            document.getElementById('shippingRow').classList.add('visible');
+            document.getElementById('shippingInput').focus();
+        }
+
+        function removeShipping() {
+            document.getElementById('shippingRow').classList.remove('visible');
+            document.getElementById('shippingInput').value = 0;
+            calculateTotals();
+        }
+
+        // ==================== Form Data ====================
+        function getFormData() {
+            const billTo = document.getElementById('billTo').value;
+            return {
+                invoiceNumber: document.getElementById('invoiceNumber').value,
+                fromAddress: document.getElementById('fromAddress').value,
+                billTo: billTo,
+                shipTo: document.getElementById('shipTo').value,
+                invoiceDate: document.getElementById('invoiceDate').value,
+                paymentTerms: document.getElementById('paymentTerms').value,
+                dueDate: document.getElementById('dueDate').value,
+                poNumber: document.getElementById('poNumber').value,
+                lineItems: [...lineItems],
+                currency: document.getElementById('currencySelect').value,
+                currencySymbol: currencySymbol,
+                taxRate: parseFloat(document.getElementById('taxInput').value) || 0,
+                discount: parseFloat(document.getElementById('discountInput').value) || 0,
+                shipping: parseFloat(document.getElementById('shippingInput').value) || 0,
+                amountPaid: parseFloat(document.getElementById('amountPaid').value) || 0,
+                notes: document.getElementById('notesInput').value,
+                terms: document.getElementById('termsInput').value,
+                clientName: billTo.split('\n')[0].trim(),
+                showDiscount: document.getElementById('discountRow').classList.contains('visible'),
+                showShipping: document.getElementById('shippingRow').classList.contains('visible'),
+                theme: document.getElementById('themeSelect').value
+            };
+        }
+
+        function setFormData(data) {
+            document.getElementById('invoiceNumber').value = data.invoiceNumber || '';
+            document.getElementById('fromAddress').value = data.fromAddress || '';
+            document.getElementById('billTo').value = data.billTo || '';
+            document.getElementById('shipTo').value = data.shipTo || '';
+            document.getElementById('invoiceDate').value = data.invoiceDate || '';
+            document.getElementById('paymentTerms').value = data.paymentTerms || '';
+            document.getElementById('dueDate').value = data.dueDate || '';
+            document.getElementById('poNumber').value = data.poNumber || '';
+            document.getElementById('currencySelect').value = data.currency || 'USD';
+            document.getElementById('taxInput').value = data.taxRate || 0;
+            document.getElementById('discountInput').value = data.discount || 0;
+            document.getElementById('shippingInput').value = data.shipping || 0;
+            document.getElementById('amountPaid').value = data.amountPaid || 0;
+            document.getElementById('notesInput').value = data.notes || '';
+            document.getElementById('termsInput').value = data.terms || '';
+            document.getElementById('themeSelect').value = data.theme || 'classic';
+
+            lineItems = data.lineItems && data.lineItems.length > 0 
+                ? [...data.lineItems] 
+                : [{ description: '', quantity: 1, rate: 0 }];
+
+            if (data.showDiscount) {
+                document.getElementById('discountRow').classList.add('visible');
+            } else {
+                document.getElementById('discountRow').classList.remove('visible');
+            }
+
+            if (data.showShipping) {
+                document.getElementById('shippingRow').classList.add('visible');
+            } else {
+                document.getElementById('shippingRow').classList.remove('visible');
+            }
+
+            updateCurrency();
+            renderLineItems();
+            calculateTotals();
+        }
+
+        function resetForm() {
+            currentInvoiceId = null;
+            document.getElementById('invoiceForm').reset();
+            document.getElementById('discountRow').classList.remove('visible');
+            document.getElementById('shippingRow').classList.remove('visible');
+            document.getElementById('discountInput').value = 0;
+            document.getElementById('shippingInput').value = 0;
+            document.getElementById('amountPaid').value = 0;
+            document.getElementById('taxInput').value = 0;
+
+            lineItems = [{ description: '', quantity: 1, rate: 0 }];
+            updateCurrency();
+            renderLineItems();
+            calculateTotals();
+            generateNextInvoiceNumber();
+        }
+
+        async function generateNextInvoiceNumber() {
+            try {
+                const invoices = await getAllInvoices();
+                let maxNumber = 0;
+                invoices.forEach(inv => {
+                    const num = parseInt(inv.invoiceNumber, 10);
+                    if (!isNaN(num) && num > maxNumber) maxNumber = num;
+                });
+                document.getElementById('invoiceNumber').value = (maxNumber + 1).toString();
+            } catch (e) {
+                document.getElementById('invoiceNumber').value = '1';
+            }
+        }
+
+        // ==================== History Panel ====================
+        function toggleHistory(open) {
+            const panel = document.getElementById('historyPanel');
+            const overlay = document.getElementById('overlay');
+            const toggle = document.getElementById('historyToggle');
+
+            if (open) {
+                panel.classList.add('open');
+                overlay.classList.add('visible');
+                toggle.setAttribute('aria-expanded', 'true');
+                loadHistory();
+                document.getElementById('historyClose').focus();
+            } else {
+                panel.classList.remove('open');
+                overlay.classList.remove('visible');
+                toggle.setAttribute('aria-expanded', 'false');
+                toggle.focus();
+            }
+        }
+
+        async function loadHistory() {
+            const list = document.getElementById('historyList');
+            try {
+                const invoices = await getAllInvoices();
+
+                if (invoices.length === 0) {
+                    list.innerHTML = '<div class="history-empty">No saved invoices yet.</div>';
+                    return;
+                }
+
+                list.innerHTML = invoices.map(inv => {
+                    const total = calculateInvoiceTotal(inv);
+                    const date = new Date(inv.createdAt).toLocaleDateString();
+                    return `
+                        <div class="history-item" tabindex="0" data-id="${inv.id}" role="listitem">
+                            <div class="history-item-header">
+                                <span class="history-item-number">Invoice #${inv.invoiceNumber}</span>
+                                <span class="history-item-date">${date}</span>
+                            </div>
+                            <div class="history-item-client">${inv.clientName || 'No client'}</div>
+                            <div class="history-item-total">${inv.currencySymbol || 'US$'}${total.toFixed(2)}</div>
+                            <div class="history-item-actions">
+                                <button class="history-btn history-btn-load" data-id="${inv.id}">Load</button>
+                                <button class="history-btn history-btn-delete" data-id="${inv.id}">Delete</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                // Event listeners
+                list.querySelectorAll('.history-btn-load').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        const id = parseInt(btn.dataset.id);
+                        const invoice = await getInvoice(id);
+                        if (invoice) {
+                            currentInvoiceId = id;
+                            setFormData(invoice);
+                            toggleHistory(false);
+                            showToast('Invoice loaded');
+                        }
+                    });
+                });
+
+                list.querySelectorAll('.history-btn-delete').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        if (confirm('Delete this invoice?')) {
+                            const id = parseInt(btn.dataset.id);
+                            await deleteInvoice(id);
+                            if (currentInvoiceId === id) resetForm();
+                            loadHistory();
+                            showToast('Invoice deleted');
+                        }
+                    });
+                });
+
+                list.querySelectorAll('.history-item').forEach(item => {
+                    item.addEventListener('keydown', async (e) => {
+                        if (e.key === 'Enter') {
+                            const id = parseInt(item.dataset.id);
+                            const invoice = await getInvoice(id);
+                            if (invoice) {
+                                currentInvoiceId = id;
+                                setFormData(invoice);
+                                toggleHistory(false);
+                                showToast('Invoice loaded');
+                            }
+                        }
+                    });
+                });
+
+            } catch (e) {
+                list.innerHTML = '<div class="history-empty">Error loading invoices.</div>';
+            }
+        }
+
+        function calculateInvoiceTotal(invoice) {
+            const subtotal = (invoice.lineItems || []).reduce((sum, item) => 
+                sum + ((item.quantity || 0) * (item.rate || 0)), 0);
+            const tax = subtotal * ((invoice.taxRate || 0) / 100);
+            return subtotal + tax - (invoice.discount || 0) + (invoice.shipping || 0);
+        }
+
+        // ==================== Initialize ====================
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await initDB();
+            } catch (e) {
+                console.error('DB init failed:', e);
+            }
+
+            renderLineItems();
+            calculateTotals();
+            generateNextInvoiceNumber();
+
+            // Event listeners
+            document.getElementById('addLineBtn').addEventListener('click', addLineItem);
+            document.getElementById('currencySelect').addEventListener('change', () => {
+                updateCurrency();
+                renderLineItems();
+            });
+            document.getElementById('taxInput').addEventListener('input', calculateTotals);
+            document.getElementById('discountInput').addEventListener('input', calculateTotals);
+            document.getElementById('shippingInput').addEventListener('input', calculateTotals);
+            document.getElementById('amountPaid').addEventListener('input', calculateTotals);
+            document.getElementById('addDiscountBtn').addEventListener('click', addDiscount);
+            document.getElementById('addShippingBtn').addEventListener('click', addShipping);
+
+            document.getElementById('downloadBtn').addEventListener('click', async () => {
+                const data = getFormData();
+                if (!data.fromAddress.trim()) {
+                    showToast('Please enter "From" information', 'error');
+                    document.getElementById('fromAddress').focus();
+                    return;
+                }
+                if (!data.billTo.trim()) {
+                    showToast('Please enter "Bill To" information', 'error');
+                    document.getElementById('billTo').focus();
+                    return;
+                }
+                await saveInvoice(data);
+                showToast('Invoice saved!');
+                window.print();
+            });
+
+            document.getElementById('historyToggle').addEventListener('click', () => toggleHistory(true));
+            document.getElementById('historyClose').addEventListener('click', () => toggleHistory(false));
+            document.getElementById('overlay').addEventListener('click', () => toggleHistory(false));
+            document.getElementById('newInvoiceBtn').addEventListener('click', () => {
+                resetForm();
+                toggleHistory(false);
+                showToast('New invoice started');
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && document.getElementById('historyPanel').classList.contains('open')) {
+                    toggleHistory(false);
+                }
+            });
+
+            // Logo upload
+            const logoInput = document.getElementById('logoInput');
+            const logoPreview = document.getElementById('logoPreview');
+            const logoPlaceholder = document.getElementById('logoPlaceholder');
+
+            logoInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        logoPreview.src = ev.target.result;
+                        logoPreview.style.display = 'block';
+                        logoPlaceholder.style.display = 'none';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Logo upload keyboard accessibility
+            document.querySelector('.logo-upload').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    logoInput.click();
+                }
+            });
+
+            // Save default link
+            document.getElementById('saveDefaultLink').addEventListener('click', (e) => {
+                e.preventDefault();
+                localStorage.setItem('invoiceDefaults', JSON.stringify({
+                    currency: document.getElementById('currencySelect').value,
+                    theme: document.getElementById('themeSelect').value,
+                    taxRate: document.getElementById('taxInput').value
+                }));
+                showToast('Defaults saved!');
+            });
+
+            // Load defaults
+            const defaults = localStorage.getItem('invoiceDefaults');
+            if (defaults) {
+                const d = JSON.parse(defaults);
+                if (d.currency) document.getElementById('currencySelect').value = d.currency;
+                if (d.theme) document.getElementById('themeSelect').value = d.theme;
+                if (d.taxRate) document.getElementById('taxInput').value = d.taxRate;
+                updateCurrency();
+            }
+        });
+    </script>
+</body>
+</html>
