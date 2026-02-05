@@ -15,7 +15,7 @@
             <span class="theme-icon">☀</span>
         </button>
         <!-- History Toggle Button -->
-        <button class="history-toggle" id="historyToggle" aria-expanded="false" aria-controls="historyPanel">
+        <button type="button" class="history-toggle" id="historyToggle" aria-expanded="false" aria-controls="historyPanel">
             ☰
         </button>
     </header>
@@ -51,7 +51,7 @@
                     <!-- From Section -->
                     <div class="from-section">
                         <textarea class="from-textarea" id="fromAddress" placeholder="Who is this from?"
-                            aria-label="From address" required></textarea>
+                            aria-label="From address" rows="4" required></textarea>
                     </div>
 
                     <div class="invoice-title-section">
@@ -69,13 +69,13 @@
                     <div class="address-column">
                         <div class="address-label" id="billToLabel">Bill To</div>
                         <textarea class="address-textarea" id="billTo" placeholder="Who is this to?"
-                            aria-labelledby="billToLabel" required></textarea>
+                            aria-labelledby="billToLabel" rows="8" required></textarea>
                     </div>
 
                     <div class="address-column">
                         <div class="address-label" id="shipToLabel">Ship To</div>
                         <textarea class="address-textarea" id="shipTo" placeholder="(optional)"
-                            aria-labelledby="shipToLabel"></textarea>
+                            aria-labelledby="shipToLabel" rows="8"></textarea>
                     </div>
 
                     <div class="details-column">
@@ -95,10 +95,8 @@
                             <label class="detail-label" for="poNumber">PO Number</label>
                             <input type="text" class="detail-input" id="poNumber" placeholder="">
                         </div>
-                        <div class="detail-row">
+                        <!-- <div class="detail-row">
                             <label class="detail-label" for="currencySelect">Currency</label>
-                            <!-- <input type="text" class="detail-input" id="poNumber" placeholder=""> -->
-                            <!-- <label class="" for="currencySelect">Currency</label> -->
                             <select class="detail-input" id="currencySelect">
                                 <option value="USD" data-symbol="US$">USD ($)</option>
                                 <option value="EUR" data-symbol="€">EUR (€)</option>
@@ -110,7 +108,7 @@
                                 <option value="CNY" data-symbol="¥">CNY (¥)</option>
                                 <option value="INR" data-symbol="₹">INR (₹)</option>
                             </select>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
 
@@ -227,7 +225,16 @@
                 Download
             </button>
 
-            <!-- <div class="control-group">
+            <button type="button" class="btn-save-template" id="saveTemplateBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                    <polyline points="7 3 7 8 15 8"></polyline>
+                </svg>
+                Save Template
+            </button>
+
+            <div class="control-group">
                 <label class="control-label" for="currencySelect">Currency</label>
                 <select class="control-select" id="currencySelect">
                     <option value="USD" data-symbol="US$">USD ($)</option>
@@ -240,16 +247,7 @@
                     <option value="CNY" data-symbol="¥">CNY (¥)</option>
                     <option value="INR" data-symbol="₹">INR (₹)</option>
                 </select>
-            </div> -->
-
-            <button type="button" class="btn-save-template" id="saveTemplateBtn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                    <polyline points="7 3 7 8 15 8"></polyline>
-                </svg>
-                Save Template
-            </button>
+            </div>
         </aside>
     </div>
 

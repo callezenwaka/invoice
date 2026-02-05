@@ -2096,8 +2096,8 @@ textarea::placeholder {
 
   /* Page setup */
   @page {
-    size: A4;
-    margin: 0.5in;
+    size: A4 portrait;
+    margin: 0.4in 0.5in;
   }
 
   /* Reset body and container */
@@ -2105,13 +2105,14 @@ textarea::placeholder {
     background: white !important;
     margin: 0;
     padding: 0;
+    font-size: 11px !important;
   }
 
   .container {
     background: white !important;
     max-width: 100% !important;
     margin: 0 !important;
-    min-height: auto !important;
+    min-height: 0 !important;
     display: block !important;
   }
 
@@ -2122,24 +2123,118 @@ textarea::placeholder {
     margin: 0 !important;
     background: white !important;
     max-width: 100% !important;
+    transform: scale(0.95);
+    transform-origin: top left;
   }
 
-  /* Optimize spacing */
+  /* Optimize spacing - more compact */
   .invoice-header {
-    margin-bottom: 16px !important;
+    margin-bottom: 10px !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    gap: 24px !important;
+  }
+
+  .logo-upload {
+    width: 180px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .invoice-header .from-section {
+    flex: 1 !important;
+    max-width: 400px !important;
+    margin-bottom: 0 !important;
+  }
+
+  .invoice-title-section {
+    text-align: right !important;
+    flex-shrink: 0 !important;
   }
 
   .address-details-row {
-    margin-bottom: 16px !important;
+    margin-bottom: 10px !important;
+    flex-direction: row !important;
+    gap: 24px !important;
+  }
+
+  .details-column {
+    width: 280px !important;
+  }
+
+  .detail-label {
+    text-align: right !important;
   }
 
   .items-section {
-    margin-top: 16px !important;
+    margin-top: 10px !important;
   }
 
   .bottom-section {
-    margin-top: 16px !important;
+    margin-top: 10px !important;
     page-break-inside: avoid;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 40px !important;
+  }
+
+  .notes-terms-column {
+    flex: 1 !important;
+    order: 1 !important;
+  }
+
+  .totals-column {
+    width: 300px !important;
+    order: 2 !important;
+  }
+
+  .total-row {
+    padding: 4px 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+
+  .total-value {
+    text-align: right !important;
+    font-size: 11px !important;
+    color: black !important;
+    font-weight: 500 !important;
+    white-space: nowrap !important;
+  }
+
+  .notes-group,
+  .terms-group {
+    margin-bottom: 8px !important;
+  }
+
+  .notes-textarea,
+  .terms-textarea {
+    width: 100% !important;
+    min-height: 70px !important;
+    padding: 10px 14px !important;
+    border: 1px solid #ddd !important;
+    border-radius: 4px !important;
+    font-size: 11px !important;
+    font-family: inherit !important;
+    background: white !important;
+    color: black !important;
+    resize: none !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+
+  .notes-label,
+  .terms-label {
+    display: block !important;
+    font-size: 11px !important;
+    color: #333 !important;
+    margin-bottom: 4px !important;
+    font-weight: 500 !important;
+  }
+
+  .detail-row {
+    margin-bottom: 4px !important;
   }
 
   /* Ensure inputs display their values */
@@ -2149,14 +2244,66 @@ textarea::placeholder {
     border: 1px solid #ddd !important;
     background: white !important;
     color: black !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
   }
 
-  .from-textarea,
-  .address-textarea,
-  .notes-textarea,
-  .terms-textarea {
+  /* Ensure text areas show their content */
+  textarea {
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 50px !important;
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+  }
+
+  /* Fix rate input alignment */
+  .rate-input-wrapper {
+    display: flex !important;
+    align-items: stretch !important;
+    width: 100% !important;
+  }
+
+  .rate-prefix {
+    padding: 6px 8px !important;
+    background: white !important;
     border: 1px solid #ddd !important;
-    min-height: auto !important;
+    border-radius: 4px 0 0 4px !important;
+    font-size: 11px !important;
+    color: #333 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .rate-input-wrapper .item-input {
+    border-radius: 0 4px 4px 0 !important;
+    margin-left: -1px !important;
+    padding: 6px 8px !important;
+    font-size: 11px !important;
+  }
+
+  .amount-paid-wrapper {
+    display: flex !important;
+    align-items: stretch !important;
+  }
+
+  .amount-paid-prefix {
+    padding: 6px 8px !important;
+    background: white !important;
+    border: 1px solid #ddd !important;
+    border-radius: 4px 0 0 4px !important;
+    font-size: 11px !important;
+    color: #333 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .invoice-title {
+    font-size: 28px !important;
+    margin-bottom: 4px !important;
   }
 
   /* Line items styling */
@@ -2188,15 +2335,77 @@ textarea::placeholder {
     color: #000 !important;
   }
 
+  .balance-due-row {
+    border-top: 1px solid #ddd !important;
+    margin-top: 4px !important;
+    padding-top: 8px !important;
+  }
+
+  .balance-due-label {
+    font-weight: 500 !important;
+    font-size: 11px !important;
+    color: #333 !important;
+  }
+
   .balance-due-value {
     color: #10b981 !important;
+    font-weight: 500 !important;
+    font-size: 11px !important;
+    text-align: right !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+  }
+
+  /* Hide optional rows unless visible */
+  .optional-row {
+    display: none !important;
+  }
+
+  .optional-row.visible {
+    display: flex !important;
   }
 
   /* Remove interactive elements styling */
   .tax-toggle {
     display: none !important;
+  }
+
+  /* Tax input styling for print */
+  .tax-input-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+  }
+
+  .tax-input {
+    width: 50px !important;
+    padding: 4px 6px !important;
+    border: 1px solid #ddd !important;
+    border-radius: 4px !important;
+    font-size: 11px !important;
+    text-align: right !important;
+    background: white !important;
+    color: black !important;
+  }
+
+  .tax-percent {
+    font-size: 11px !important;
+    color: #333 !important;
+  }
+
+  /* Amount paid and other input wrappers */
+  .amount-paid-input,
+  #discountInput,
+  #shippingInput {
+    width: 80px !important;
+    padding: 6px 8px !important;
+    border: 1px solid #ddd !important;
+    border-radius: 0 4px 4px 0 !important;
+    margin-left: -1px !important;
+    font-size: 11px !important;
+    text-align: right !important;
+    background: white !important;
+    color: black !important;
   }
 
   /* Ensure proper sizing */
