@@ -2231,7 +2231,9 @@ textarea::placeholder {
   .notes-textarea,
   .terms-textarea {
     width: 100% !important;
+    height: auto !important;
     min-height: 70px !important;
+    max-height: none !important;
     padding: 10px 14px !important;
     border: 1px solid transparent !important;
     border-radius: 4px !important;
@@ -2242,6 +2244,8 @@ textarea::placeholder {
     resize: none !important;
     overflow: visible !important;
     display: block !important;
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
   }
 
   .notes-label,
@@ -2273,11 +2277,20 @@ textarea::placeholder {
   textarea {
     overflow: visible !important;
     height: auto !important;
+    max-height: none !important;
     min-height: 50px !important;
     white-space: pre-wrap !important;
     word-wrap: break-word !important;
     border: 1px solid transparent !important;
     resize: none !important;
+  }
+
+  /* Specifically ensure notes and terms show all content */
+  #notesInput,
+  #termsInput {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
   }
 
   /* Fix rate input alignment */
@@ -2467,6 +2480,94 @@ textarea::placeholder {
   .logo-preview {
     max-height: 80px !important;
   }
+}
+
+/* Preview Button */
+.btn-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 20px;
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-bottom: 8px;
+}
+
+.btn-preview:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.btn-preview svg {
+  width: 18px;
+  height: 18px;
+}
+
+@media (min-width: 768px) {
+  .btn-preview {
+    padding: 12px 16px;
+    font-size: 15px;
+  }
+
+  .btn-preview svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* PDF Print-Safety Styles
+ * Applied to #invoiceForm during html2pdf capture.
+ * Forces white background and professional typography
+ * regardless of the active app theme (e.g. dark mode). */
+#invoiceForm {
+  background-color: white !important;
+  color: #333 !important;
+  box-shadow: none !important;
+}
+
+#invoiceForm table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+#invoiceForm th {
+  background-color: #f8f9fa !important;
+  text-align: left;
+  padding: 12px;
+  border-bottom: 2px solid #dee2e6;
+}
+
+#invoiceForm td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+#invoiceForm tr {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+}
+
+/* Pagination utility classes */
+.avoid-break {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+}
+
+.force-page-break {
+  page-break-before: always !important;
+  break-before: page !important;
+}
+
+.no-print {
+  display: none !important;
 }
 
 /* Visually hidden for screen readers */

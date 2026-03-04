@@ -62,25 +62,43 @@ async function loadCurrencies() {
     }
 }
 
-// Populate currency select dropdown
+const SHORT_CURRENCY_CODES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'INR'];
+
+function makeCurrencyOption(currency) {
+    const option = document.createElement('option');
+    option.value = currency.code;
+    option.textContent = currency.name;
+    option.setAttribute('data-symbol', currency.symbol || currency.code);
+    return option;
+}
+
+// Populate currency select with two optgroups:
+// "Common" → the 9 most-used currencies
+// "All currencies" → everything else from data.json
 function populateCurrencySelect() {
     const select = document.getElementById('currencySelect');
     if (!select) return;
 
-    // Clear existing options
+    const currentValue = select.value || InvoiceApp.invoice.currency;
     select.innerHTML = '';
 
-    // Add all currencies
-    Object.values(currencies).forEach(currency => {
-        const option = document.createElement('option');
-        option.value = currency.code;
-        option.textContent = currency.name;
-        option.setAttribute('data-symbol', currency.symbol || currency.code);
-        select.appendChild(option);
+    const commonGroup = document.createElement('optgroup');
+    commonGroup.label = 'Common';
+    SHORT_CURRENCY_CODES.forEach(code => {
+        const currency = currencies[code];
+        if (currency) commonGroup.appendChild(makeCurrencyOption(currency));
     });
+    select.appendChild(commonGroup);
 
-    // Set the selected value to current currency
-    select.value = InvoiceApp.invoice.currency;
+    const rest = Object.values(currencies).filter(c => !SHORT_CURRENCY_CODES.includes(c.code));
+    if (rest.length > 0) {
+        const allGroup = document.createElement('optgroup');
+        allGroup.label = 'All currencies';
+        rest.forEach(currency => allGroup.appendChild(makeCurrencyOption(currency)));
+        select.appendChild(allGroup);
+    }
+
+    select.value = currentValue;
 }
 
 // Initialize the application
@@ -119,14 +137,14 @@ function renderLineItems() {
     const container = document.getElementById('lineItemsContainer');
     container.innerHTML = '';
 
-    InvoiceApp.invoice.items.forEach((item, index) => {
-        const row = createLineItemRow(item, index);
+    InvoiceApp.invoice.items.forEach((item) => {
+        const row = createLineItemRow(item);
         container.appendChild(row);
     });
 }
 
 // Create a single line item row
-function createLineItemRow(item, index) {
+function createLineItemRow(item) {
     const row = document.createElement('div');
     row.className = 'line-item-row';
     row.setAttribute('role', 'row');
@@ -374,6 +392,9 @@ function setupEventListeners() {
     // Currency select
     document.getElementById('currencySelect').addEventListener('change', handleCurrencyChange);
 
+    // Preview button
+    document.getElementById('previewBtn').addEventListener('click', previewInvoice);
+
     // Download button
     document.getElementById('downloadBtn').addEventListener('click', downloadInvoice);
 
@@ -558,13 +579,87 @@ function handleLogoUpload(event) {
     reader.readAsDataURL(file);
 }
 
+// Preview invoice in the PDF.js viewer
+async function previewInvoice() {
+    const element = document.getElementById('invoiceForm');
+    if (!element) {
+        console.error('Invoice element not found!');
+        return;
+    }
+
+    const opt = {
+        margin: 0.5,
+        filename: `invoice-${InvoiceApp.invoice.number}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+            scale: 2,
+            useCORS: true,
+            letterRendering: true
+        },
+        jsPDF: {
+            unit: 'in',
+            format: 'letter',
+            orientation: 'portrait'
+        },
+        pagebreak: {
+            mode: ['avoid-all', 'css', 'legacy']
+        }
+    };
+
+    // html2canvas doesn't reliably render textarea content.
+    // Replace each textarea with a plain div (same styles + text) before capture,
+    // then restore afterward.
+    const replacements = [];
+    element.querySelectorAll('textarea').forEach(ta => {
+        const cs = window.getComputedStyle(ta);
+        const div = document.createElement('div');
+        div.style.cssText = [
+            `font: ${cs.font}`,
+            `color: ${cs.color}`,
+            `background: ${cs.backgroundColor}`,
+            `padding: ${cs.padding}`,
+            `border: ${cs.border}`,
+            `border-radius: ${cs.borderRadius}`,
+            `width: 100%`,
+            `box-sizing: border-box`,
+            `white-space: pre-wrap`,
+            `word-break: break-word`,
+        ].join(';');
+        div.textContent = ta.value;
+        ta.insertAdjacentElement('afterend', div);
+        ta.style.display = 'none';
+        replacements.push({ ta, div });
+    });
+
+    const restore = () => {
+        replacements.forEach(({ ta, div }) => {
+            ta.style.display = '';
+            div.remove();
+        });
+    };
+
+    console.log('[previewInvoice] Replaced', replacements.length, 'textarea(s) with divs');
+
+    try {
+        showToast('Generating preview...');
+        console.log('[previewInvoice] Starting html2pdf capture...');
+        const pdfBlob = await html2pdf().set(opt).from(element).output('blob');
+        console.log('[previewInvoice] Blob generated, size:', pdfBlob.size, 'bytes');
+        restore();
+        const blobURL = URL.createObjectURL(pdfBlob);
+        console.log('[previewInvoice] Opening viewer:', blobURL);
+        const viewerPath = `/public/pdfviewer/web/viewer.html?file=${encodeURIComponent(blobURL)}`;
+        window.open(viewerPath, '_blank');
+    } catch (error) {
+        restore();
+        console.error('[previewInvoice] PDF generation failed:', error);
+        showToast('Preview failed. Please try again.');
+    }
+}
+
 // Download invoice as PDF
 function downloadInvoice() {
-    // Save current invoice to history
     saveToHistory();
-
-    // For now, use print functionality
-    // In a production app, you'd use a library like jsPDF or html2pdf
     window.print();
     showToast('Invoice downloaded');
 }
