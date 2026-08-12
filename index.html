@@ -1,269 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Invoice</title>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice Generator</title>
-    <link rel="stylesheet" href="style.css">
-</head>
+    <!--
+      Barlow and Barlow Condensed, the Industry typefaces. Linked rather than
+      @imported from CSS so the connection can be warmed in parallel.
 
-<body>
-    <header class="app-header">
-        <h1 class="app-title">Invoice Generator</h1>
-        <button type="button" class="theme-toggle" id="headerThemeToggle" aria-label="Toggle theme">
-            <span class="theme-icon">☀</span>
-        </button>
-        <!-- History Toggle Button -->
-        <button type="button" class="history-toggle" id="historyToggle" aria-expanded="false" aria-controls="historyPanel">
-            ☰
-        </button>
-    </header>
-    <a href="#main-content" class="skip-link">Skip to main content</a>
+      These are CDN-hosted, which the offline requirement will outgrow: the faces
+      need self-hosting to be precached, and the same files feed pdfmake's font
+      vfs. One task, two consumers.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;700&family=Barlow+Condensed:wght@400;600&display=swap"
+    />
 
-    <!-- History Panel -->
-    <div class="overlay" id="overlay"></div>
-    <aside class="history-panel" id="historyPanel" role="dialog" aria-label="Invoice History" aria-modal="true">
-        <div class="history-header">
-            <h2 class="history-title">Invoice History</h2>
-            <button class="history-close" id="historyClose" aria-label="Close history panel">&times;</button>
-        </div>
-        <div class="history-list" id="historyList" role="list">
-            <!-- History items rendered here -->
-        </div>
-        <button class="history-new-btn" id="newInvoiceBtn">+ New Invoice</button>
-    </aside>
-
-    <div class="container">
-        <!-- Main Invoice Area -->
-        <main class="invoice-main" id="main-content">
-            <form id="invoiceForm" aria-label="Invoice form">
-                <!-- Header: Logo and Title -->
-                <div class="invoice-header">
-                    <label class="logo-upload" for="logoInput" aria-label="Upload company logo">
-                        <input type="file" id="logoInput" accept="image/*" aria-label="Choose logo file">
-                        <div class="logo-placeholder" id="logoPlaceholder">
-                            <span>+</span> Add Your Logo
-                        </div>
-                        <img id="logoPreview" class="logo-preview" alt="Company logo">
-                    </label>
-
-                    <!-- From Section -->
-                    <div class="from-section">
-                        <textarea class="from-textarea" id="fromAddress" placeholder="Who is this from?"
-                            aria-label="From address" rows="4" required></textarea>
-                    </div>
-
-                    <div class="invoice-title-section">
-                        <div class="invoice-title">INVOICE</div>
-                        <div class="invoice-number-row">
-                            <span class="invoice-number-prefix">#</span>
-                            <input type="text" class="invoice-number-input" id="invoiceNumber" value="1"
-                                aria-label="Invoice number">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bill To, Ship To, and Details -->
-                <div class="address-details-row">
-                    <div class="address-column">
-                        <div class="address-label" id="billToLabel">Bill To</div>
-                        <textarea class="address-textarea" id="billTo" placeholder="Who is this to?"
-                            aria-labelledby="billToLabel" rows="8" required></textarea>
-                    </div>
-
-                    <div class="address-column">
-                        <div class="address-label" id="shipToLabel">Ship To</div>
-                        <textarea class="address-textarea" id="shipTo" placeholder="(optional)"
-                            aria-labelledby="shipToLabel" rows="8"></textarea>
-                    </div>
-
-                    <div class="details-column">
-                        <div class="detail-row">
-                            <label class="detail-label" for="invoiceDate">Date</label>
-                            <input type="date" class="detail-input" id="invoiceDate">
-                        </div>
-                        <div class="detail-row">
-                            <label class="detail-label" for="paymentTerms">Payment Terms</label>
-                            <input type="text" class="detail-input" id="paymentTerms" placeholder="">
-                        </div>
-                        <div class="detail-row">
-                            <label class="detail-label" for="dueDate">Due Date</label>
-                            <input type="date" class="detail-input" id="dueDate">
-                        </div>
-                        <div class="detail-row">
-                            <label class="detail-label" for="poNumber">PO Number</label>
-                            <input type="text" class="detail-input" id="poNumber" placeholder="">
-                        </div>
-                        <!-- <div class="detail-row">
-                            <label class="detail-label" for="currencySelect">Currency</label>
-                            <select class="detail-input" id="currencySelect">
-                                <option value="USD" data-symbol="US$">USD ($)</option>
-                                <option value="EUR" data-symbol="€">EUR (€)</option>
-                                <option value="GBP" data-symbol="£">GBP (£)</option>
-                                <option value="JPY" data-symbol="¥">JPY (¥)</option>
-                                <option value="CAD" data-symbol="CA$">CAD ($)</option>
-                                <option value="AUD" data-symbol="AU$">AUD ($)</option>
-                                <option value="CHF" data-symbol="CHF">CHF</option>
-                                <option value="CNY" data-symbol="¥">CNY (¥)</option>
-                                <option value="INR" data-symbol="₹">INR (₹)</option>
-                            </select>
-                        </div> -->
-                    </div>
-                </div>
-
-                <!-- Line Items -->
-                <section class="items-section" role="table" aria-label="Invoice line items">
-                    <div class="items-header" role="rowgroup">
-                        <div class="items-header-row" role="row">
-                            <div class="col-item" role="columnheader">Item</div>
-                            <div class="col-quantity" role="columnheader">Quantity</div>
-                            <div class="col-rate" role="columnheader">Rate</div>
-                            <div class="col-amount" role="columnheader">Amount</div>
-                        </div>
-                    </div>
-
-                    <div id="lineItemsContainer" role="rowgroup" aria-label="Line items list">
-                        <!-- Line items rendered here -->
-                    </div>
-                </section>
-
-                <button type="button" class="add-line-btn" id="addLineBtn">
-                    <span>+</span> Line Item
-                </button>
-
-                <!-- Bottom: Notes/Terms and Totals -->
-                <div class="bottom-section">
-                    <div class="notes-terms-column">
-                        <div class="notes-group">
-                            <label class="notes-label" for="notesInput">Notes</label>
-                            <textarea class="notes-textarea" id="notesInput"
-                                placeholder="Notes - any relevant information not already covered"></textarea>
-                        </div>
-                        <div class="terms-group">
-                            <label class="terms-label" for="termsInput">Terms</label>
-                            <textarea class="terms-textarea" id="termsInput"
-                                placeholder="Terms and conditions - late fees, payment methods, delivery schedule"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="totals-column" role="region" aria-label="Invoice totals">
-                        <div class="total-row">
-                            <span class="total-label">Subtotal</span>
-                            <span class="total-value" id="subtotalDisplay">US$0.00</span>
-                        </div>
-
-                        <div class="total-row optional-row" id="discountRow">
-                            <button type="button" class="remove-field" aria-label="Remove discount"
-                                onclick="removeDiscount()">&times;</button>
-                            <span class="total-label">Discount</span>
-                            <div class="amount-paid-wrapper">
-                                <span class="amount-paid-prefix">$</span>
-                                <input type="number" class="amount-paid-input" id="discountInput" value="0" min="0"
-                                    step="0.01" aria-label="Discount amount">
-                            </div>
-                        </div>
-
-                        <div class="total-row">
-                            <span class="total-label">Tax</span>
-                            <div class="tax-input-wrapper">
-                                <input type="number" class="tax-input" id="taxInput" value="0" min="0" step="0.1"
-                                    aria-label="Tax percentage">
-                                <span class="tax-percent">%</span>
-                                <button type="button" class="tax-toggle" aria-label="Toggle tax type"
-                                    title="Toggle between percentage and fixed amount">⇄</button>
-                            </div>
-                        </div>
-
-                        <div class="add-links">
-                            <button type="button" class="add-link" id="addDiscountBtn">+ Discount</button>
-                            <button type="button" class="add-link" id="addShippingBtn">+ Shipping</button>
-                        </div>
-
-                        <div class="total-row optional-row" id="shippingRow">
-                            <button type="button" class="remove-field" aria-label="Remove shipping"
-                                onclick="removeShipping()">&times;</button>
-                            <span class="total-label">Shipping</span>
-                            <div class="amount-paid-wrapper">
-                                <span class="amount-paid-prefix">$</span>
-                                <input type="number" class="amount-paid-input" id="shippingInput" value="0" min="0"
-                                    step="0.01" aria-label="Shipping amount">
-                            </div>
-                        </div>
-
-                        <div class="total-row">
-                            <span class="total-label">Total</span>
-                            <span class="total-value" id="totalDisplay">US$0.00</span>
-                        </div>
-
-                        <div class="total-row">
-                            <span class="total-label">Amount Paid</span>
-                            <div class="amount-paid-wrapper">
-                                <span class="amount-paid-prefix">$</span>
-                                <input type="number" class="amount-paid-input" id="amountPaid" value="0" min="0"
-                                    step="0.01" aria-label="Amount paid">
-                            </div>
-                        </div>
-
-                        <div class="total-row balance-due-row">
-                            <span class="total-label balance-due-label">Balance Due</span>
-                            <span class="total-value balance-due-value" id="balanceDueDisplay">US$0.00</span>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </main>
-
-        <!-- Right Sidebar Controls -->
-        <aside class="invoice-controls" aria-label="Invoice settings">
-            <button type="button" class="btn-preview" id="previewBtn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                </svg>
-                Preview
-            </button>
-
-            <button type="button" class="btn-download" id="downloadBtn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-                Download
-            </button>
-
-            <button type="button" class="btn-save-template" id="saveTemplateBtn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                    <polyline points="7 3 7 8 15 8"></polyline>
-                </svg>
-                Save Template
-            </button>
-
-            <div class="control-group">
-                <label class="control-label" for="currencySelect">Currency</label>
-                <select class="control-select" id="currencySelect">
-                    <option value="USD" data-symbol="US$">USD ($)</option>
-                    <option value="EUR" data-symbol="€">EUR (€)</option>
-                    <option value="GBP" data-symbol="£">GBP (£)</option>
-                    <option value="JPY" data-symbol="¥">JPY (¥)</option>
-                    <option value="CAD" data-symbol="CA$">CAD ($)</option>
-                    <option value="AUD" data-symbol="AU$">AUD ($)</option>
-                    <option value="CHF" data-symbol="CHF">CHF</option>
-                    <option value="CNY" data-symbol="¥">CNY (¥)</option>
-                    <option value="INR" data-symbol="₹">INR (₹)</option>
-                </select>
-            </div>
-        </aside>
-    </div>
-
-    <!-- Toast Notification -->
-    <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="script.js"></script>
-</body>
-
+    <script>
+      // Applied before first paint so a dark-theme user never sees a light flash.
+      try {
+        var stored = localStorage.getItem('invoice.theme')
+        document.documentElement.dataset.theme = stored === 'dark' ? 'dark' : 'light'
+      } catch (error) {
+        document.documentElement.dataset.theme = 'light'
+      }
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
 </html>

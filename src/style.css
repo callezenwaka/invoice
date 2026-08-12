@@ -1,0 +1,204 @@
+@import './styles/tokens.css';
+@import './styles/industry.css';
+
+/**
+ * Application base. Anything Industry already defines belongs in
+ * `industry.css`; this file is only what the app adds on top.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  /* Never let a wide table scroll the whole page sideways. */
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  line-height: 1.15;
+  margin: 0;
+}
+
+/* Keyboard focus is themed everywhere, never the browser default ring. */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Guidance sits behind the value, never mistaken for it. */
+::placeholder {
+  color: color-mix(in srgb, var(--color-text) 40%, transparent);
+  opacity: 1;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-accent) 25%, transparent);
+}
+
+a {
+  color: var(--color-accent-text);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+/* Amounts and dates align in columns only with tabular figures. */
+.amt,
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.text-muted {
+  color: color-mix(in srgb, var(--color-text) 62%, transparent);
+}
+
+/* Present for assistive technology, absent visually. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/**
+ * A table that survives a narrow screen.
+ *
+ * Below the tablet breakpoint each row becomes a labelled two-column stack; a
+ * genuine table returns above it. The markup stays a `<table>` throughout, so
+ * the semantics never change with the layout — only the presentation does.
+ *
+ * Every `<td>` needs `data-label`, which supplies the stacked heading.
+ */
+.table-stack {
+  width: 100%;
+}
+
+.table-stack thead {
+  display: none;
+}
+
+.table-stack tr {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-1) var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-divider);
+}
+
+.table-stack td {
+  display: contents;
+}
+
+.table-stack td::before {
+  content: attr(data-label);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-text) 60%, transparent);
+  align-self: center;
+}
+
+@media (min-width: 40rem) {
+  .table-stack thead {
+    display: table-header-group;
+  }
+
+  .table-stack tr {
+    display: table-row;
+  }
+
+  .table-stack td,
+  .table-stack th {
+    display: table-cell;
+    padding: var(--space-3) var(--space-3) var(--space-3) 0;
+    text-align: left;
+  }
+
+  .table-stack td::before {
+    content: none;
+  }
+
+  .table-stack .numeric {
+    text-align: right;
+  }
+}
+
+/**
+ * Invoice status, tinted from the accent ramp.
+ *
+ * Industry is a mono scheme, so status reads through weight and fill rather
+ * than semantic red and green.
+ */
+.tag--overdue {
+  background: var(--color-accent-800);
+  color: var(--color-bg);
+}
+
+.tag--sent {
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent-text);
+}
+
+.tag--paid {
+  background: var(--color-accent-100);
+  color: var(--color-accent-800);
+}
+
+.tag--draft,
+.tag--void {
+  background: var(--color-neutral-100);
+  color: var(--color-neutral-800);
+}
+
+.tag--void {
+  text-decoration: line-through;
+}
+
+/* Visible only to screen readers, and to sighted users once focused. */
+.skip-link {
+  position: absolute;
+  left: var(--space-3);
+  top: var(--space-3);
+  z-index: 100;
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-accent);
+  color: var(--color-bg);
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
