@@ -55,12 +55,15 @@ function onToggleTheme() {
  * all three sit on one line in document order.
  */
 
+/* `viewport-fit=cover` lets the page reach the screen edges, so the insets have
+   to be added back or the notch and home indicator sit over content. */
 .app-header {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-3) var(--space-4) 0;
+  padding: calc(var(--space-3) + env(safe-area-inset-top)) calc(var(--space-4) + env(safe-area-inset-right))
+    0 calc(var(--space-4) + env(safe-area-inset-left));
   border-bottom: 1px solid var(--color-divider);
 }
 
@@ -117,13 +120,15 @@ function onToggleTheme() {
 }
 
 .app-main {
-  padding: var(--space-4);
+  padding: var(--space-4) calc(var(--space-4) + env(safe-area-inset-right))
+    calc(var(--space-4) + env(safe-area-inset-bottom)) calc(var(--space-4) + env(safe-area-inset-left));
 }
 
 @media (min-width: 40rem) {
   .app-header {
     gap: var(--space-6);
-    padding: var(--space-2) var(--space-6) 0;
+    padding: calc(var(--space-2) + env(safe-area-inset-top)) calc(var(--space-6) + env(safe-area-inset-right))
+      0 calc(var(--space-6) + env(safe-area-inset-left));
   }
 
   .app-nav {
@@ -134,7 +139,8 @@ function onToggleTheme() {
   }
 
   .app-main {
-    padding: var(--space-6);
+    padding: var(--space-6) calc(var(--space-6) + env(safe-area-inset-right))
+      calc(var(--space-6) + env(safe-area-inset-bottom)) calc(var(--space-6) + env(safe-area-inset-left));
   }
 }
 

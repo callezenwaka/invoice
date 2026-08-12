@@ -1,11 +1,40 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
+import { Theme, THEME_STORAGE_KEY } from './src/config/theme.js'
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
+    /**
+     * Applies the stored theme before first paint.
+     *
+     * This cannot live in the app: a Vue composable runs after mount, by which
+     * point the page has painted and a dark-theme user has seen a white flash.
+     * It has to be inline and synchronous.
+     *
+     * Generated from the same constants `utils/theme.ts` uses, so the key and
+     * the default cannot drift apart in two hand-written copies.
+     */
+    {
+      name: 'theme-preload',
+      transformIndexHtml(html: string) {
+        const script = [
+          '<script>',
+          '  try {',
+          `    var stored = localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)})`,
+          `    document.documentElement.dataset.theme =`,
+          `      stored === ${JSON.stringify(Theme.Dark)} ? ${JSON.stringify(Theme.Dark)} : ${JSON.stringify(Theme.Light)}`,
+          '  } catch {',
+          `    document.documentElement.dataset.theme = ${JSON.stringify(Theme.Light)}`,
+          '  }',
+          '<\/script>',
+        ].join('\n    ')
+
+        return html.replace('<!--theme-preload-->', script)
+      },
+    },
     /**
      * `injectManifest` rather than `generateSW`: the worker is ours (src/sw.ts)
      * and Workbox only supplies the precache list.

@@ -2,10 +2,32 @@
 <html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="color-scheme" content="light dark" />
+
+    <!-- `viewport-fit=cover` lets an installed app use the full screen; the
+         safe-area insets in style.css keep content clear of the notch. No
+         `maximum-scale` — pinch-zoom must stay available. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
     <title>Invoice</title>
+    <meta name="description" content="Draft, issue and track invoices. Works offline." />
+
+    <!-- Native controls follow this; the exact theme is applied below and kept
+         in step by applyTheme(). -->
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#f2f2f3" />
+
+    <!-- iOS has no install API, so the Home Screen route is the only way to
+         make storage durable there (spec §3.1). These are what it reads. -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Invoice" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Addresses and invoice numbers contain digits that iOS would otherwise
+         turn into telephone links. -->
+    <meta name="format-detection" content="telephone=no" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
     <!--
       Barlow and Barlow Condensed, the Industry typefaces. Linked rather than
@@ -22,15 +44,7 @@
       href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;700&family=Barlow+Condensed:wght@400;600&display=swap"
     />
 
-    <script>
-      // Applied before first paint so a dark-theme user never sees a light flash.
-      try {
-        var stored = localStorage.getItem('invoice.theme')
-        document.documentElement.dataset.theme = stored === 'dark' ? 'dark' : 'light'
-      } catch (error) {
-        document.documentElement.dataset.theme = 'light'
-      }
-    </script>
+    <!--theme-preload-->
   </head>
   <body>
     <div id="app"></div>
