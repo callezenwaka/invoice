@@ -68,6 +68,14 @@ a {
   font-variant-numeric: tabular-nums;
 }
 
+/* Industry's .btn is not a flex container; icons beside labels need one. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
 .text-muted {
   color: color-mix(in srgb, var(--color-text) 62%, transparent);
 }

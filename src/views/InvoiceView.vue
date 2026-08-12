@@ -11,6 +11,7 @@ import { parseLine } from '../utils/parseLine'
 import { orDash } from '../utils/display'
 import { download, pdfFilename, toDataUrl } from '../utils/pdf'
 import { invoiceDocument } from '../utils/invoiceDocument'
+import AppIcon from '../components/AppIcon.vue'
 import { TaxMode } from '../types'
 import type { Invoice, LineItem, Sender } from '../types'
 
@@ -249,18 +250,23 @@ watch(status, (value) => {
             <i class="corner tl" /><i class="corner tr" /><i class="corner bl" /><i
               class="corner br"
             />
+            <AppIcon name="send" :size="16" />
             Issue
           </button>
         </template>
         <button v-else class="btn btn-secondary" @click="onReplace">Replace this invoice</button>
 
-        <button class="btn btn-secondary" :disabled="busy" @click="onPreview">Preview</button>
+        <button class="btn btn-secondary" :disabled="busy" @click="onPreview">
+          <AppIcon name="eye" :size="16" />
+          Preview
+        </button>
         <button
           class="btn btn-secondary"
           :disabled="busy || !invoice.number"
           :title="invoice.number ? undefined : 'Issue the invoice to download it'"
           @click="onDownload"
         >
+          <AppIcon name="download" :size="16" />
           Download
         </button>
       </div>
@@ -437,7 +443,7 @@ watch(status, (value) => {
                   :aria-label="`Remove ${item.description || 'line item'}`"
                   @click="removeItem(item.id)"
                 >
-                  ×
+                  <AppIcon name="x" :size="16" />
                 </button>
               </td>
             </tr>
@@ -594,7 +600,8 @@ watch(status, (value) => {
               class="btn btn-ghost"
               @click="showDiscount = true"
             >
-              + Discount
+              <AppIcon name="plus" :size="14" />
+              Discount
             </button>
             <button
               v-if="!showShipping"
@@ -602,7 +609,8 @@ watch(status, (value) => {
               class="btn btn-ghost"
               @click="showShipping = true"
             >
-              + Shipping
+              <AppIcon name="plus" :size="14" />
+              Shipping
             </button>
           </div>
 

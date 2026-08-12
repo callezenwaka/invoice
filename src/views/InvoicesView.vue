@@ -5,6 +5,7 @@ import { useClients } from '../composables/useClients'
 import { computeTotals, effectiveStatus } from '../utils/invoice'
 import { summarise, filterByStatus, byIssueDate } from '../utils/summary'
 import { formatMoney } from '../utils/money'
+import AppIcon from '../components/AppIcon.vue'
 import { EMPTY_MARKER, orDash } from '../utils/display'
 import { EffectiveStatus, InvoiceStatus } from '../types'
 import type { CurrencyAmount } from '../utils/summary'
@@ -60,6 +61,7 @@ function amounts(entries: CurrencyAmount[]): string {
       <h1>Invoices</h1>
       <RouterLink class="btn btn-primary blueprint" to="/invoices/new">
         <i class="corner tl" /><i class="corner tr" /><i class="corner bl" /><i class="corner br" />
+        <AppIcon name="plus" :size="16" />
         New invoice
       </RouterLink>
     </header>

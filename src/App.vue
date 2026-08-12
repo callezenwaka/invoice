@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue'
 import { Theme, applyTheme, storedTheme, toggleTheme } from './utils/theme'
 import PwaNotices from './components/PwaNotices.vue'
+import AppLogo from './components/AppLogo.vue'
 
 const theme = ref<Theme>(Theme.Light)
 
@@ -19,7 +20,9 @@ function onToggleTheme() {
   <a class="skip-link" href="#main">Skip to content</a>
 
   <header class="app-header">
-    <RouterLink class="app-brand" to="/invoices">Invoice</RouterLink>
+    <RouterLink class="app-brand" to="/invoices" aria-label="Invoice — home">
+      <AppLogo :size="22" />
+    </RouterLink>
 
     <nav class="app-nav" aria-label="Main">
       <RouterLink to="/invoices">Invoices</RouterLink>
@@ -68,11 +71,7 @@ function onToggleTheme() {
 }
 
 .app-brand {
-  font-family: var(--font-heading);
-  font-weight: var(--font-heading-weight);
-  font-size: 20px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  display: inline-flex;
   color: var(--color-text);
   text-decoration: none;
 }
