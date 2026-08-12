@@ -22,4 +22,7 @@ pnpm-debug.log*
 *.sln
 *.sw?
 
+design/
 spec.md
+# vite-plugin-pwa dev output
+dev-dist
